@@ -2,7 +2,13 @@ import datetime
 import xlwt
 import MusicDict
 import WebCon
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
+options = Options()
+options.add_argument('--headless')
+driver = webdriver.Chrome(options=options)
+driver.implicitly_wait(10)
 musicDict = MusicDict.musicDict
 i = 0
 length = len(musicDict)
@@ -16,15 +22,13 @@ for key, value in musicDict.items():
     musicList = value
     num = 0
     for music in musicList:
-        each = WebCon.webconnect(music)
+        each = WebCon.webconnect(music, driver)
         try:
             num += int(each)
         except ValueError:
-            each = WebCon.webconnect(music)
+            each = WebCon.webconnect(music, driver)
             num += int(each)
         print(each)
-    if key == '里香':
-        num += 14
     numStr = str(num)
     print(key + " : " + numStr)
     print("进度%s/%s" % (i + 1, length))
@@ -37,6 +41,7 @@ for key, value in musicDict.items():
     i += 1
     if i == length:
         break
+driver.close()
 dictList = sorted(characterNumDict.items(), key=lambda d: d[1], reverse=False)
 
 # 创建excel表格
